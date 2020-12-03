@@ -1,0 +1,5 @@
+*.torrent
+*.pbf
+*.fastresume
+*~
+*.pyc
