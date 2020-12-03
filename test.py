@@ -484,8 +484,9 @@ class test_error_code(unittest.TestCase):
 
 if __name__ == '__main__':
 	print(lt.__version__)
-	shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'url_seed_multi.torrent'), '.')
-	shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'base.torrent'), '.')
-	shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'unordered.torrent'), '.')
+	#shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'url_seed_multi.torrent'), '.')
+	#shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'base.torrent'), '.')
+	#shutil.copy(os.path.join('..', '..', 'test', 'test_torrents', 'unordered.torrent'), '.')
+	shutil.copy(os.path.join('.', '.', '.', 'test', 'url_seed_multi.torrent'), '.')
 	unittest.main()
 
