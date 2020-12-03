@@ -4,7 +4,15 @@ import time
 import sys
 import pprint
 
-ses = lt.session()
+
+settings = { 'user_agent': 'python_client/' + lt.__version__,
+#        'download_rate_limit': int(options.max_download_rate),
+#        'upload_rate_limit': int(options.max_upload_rate),
+#        'listen_interfaces': '0.0.0.0:%d' % options.port,
+        'alert_mask': lt.alert.category_t.all_categories
+}
+
+ses = lt.session(settings)
 ses.listen_on(6881, 6891)
 
 info = lt.torrent_info(sys.argv[1])
@@ -40,7 +48,10 @@ while (not h.is_seed()):
         else:
             id = peer.client
 
-        print ' peer ', id
+        if peer.flags & lt.peer_info.seed:
+            print ' webseed '+id if peer.connection_type & lt.peer_info.web_seed else '    seed '+id
+        else:
+            print '    peer '+id
 
    alerts = ses.pop_alerts()
    for a in alerts:
