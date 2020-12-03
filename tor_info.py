@@ -9,28 +9,35 @@ settings = { 'user_agent': 'python_client/' + lt.__version__,
 #        'download_rate_limit': int(options.max_download_rate),
 #        'upload_rate_limit': int(options.max_upload_rate),
 #        'listen_interfaces': '0.0.0.0:%d' % options.port,
-        'alert_mask': lt.alert.category_t.all_categories
+#        'alert_mask': lt.alert.category_t.all_categories,
+        'alert_mask': lt.alert.category_t.error_notification | lt.alert.category_t.tracker_notification | lt.alert.category_t.status_notification,
+        'num_want': 1000,
+        'enable_dht': 0,
 }
 
 ses = lt.session(settings)
 ses.listen_on(6881, 6891)
 
 info = lt.torrent_info(sys.argv[1])
-
 print "piece len=", info.piece_length(), " piece count=", info.num_pieces()
 print "creator=", info.creator(), "comment=", info.comment()
 print "name=", info.name(), "num_files=", info.num_files()
 print "magnet=", lt.make_magnet_uri(info)
 
-for tracker in info.trackers():
-  print "  tracker=", tracker.tier, tracker.url
-  #pprint.pprint (tracker.['endpoints'])
 
-h = ses.add_torrent({'ti': info, 'save_path': './'})
-print 'starting', h.name()
+th = ses.add_torrent({'ti': info, 'save_path': './'})
 
-while (not h.is_seed()):
-   s = h.status()
+print 'starting', th.name()
+print "magnet2=", lt.make_magnet_uri(th)
+
+
+
+#for webseed in th.web_seeds():
+#  print "webseed", webseed
+#  #info.remove_url_seed (webseed)
+
+while (not th.is_seed()):
+   s = th.status()
 
    state_str = ['queued', 'checking', 'downloading metadata', \
       'downloading', 'finished', 'seeding', 'allocating', 'checking fastresume']
@@ -39,6 +46,10 @@ while (not h.is_seed()):
       s.num_peers, state_str[s.state]),
 
    print 'peers: %d/(%d,%d) seeds: %d/(%d,%d) distributed copies: %d' % (s.num_peers, s.list_peers, s.num_incomplete, s.num_seeds, s.list_seeds, s.num_complete, s.distributed_copies)
+
+   for tracker in th.trackers():
+     print "  tracker=", tracker#.tier, tracker.url
+     #pprint.pprint (tracker.['endpoints'])
    
    for peer in s.handle.get_peer_info():
         if peer.flags & lt.peer_info.handshake:
@@ -53,6 +64,8 @@ while (not h.is_seed()):
         else:
             print '    peer '+id
 
+        print ' - peer source:', peer.source, ', addr=', peer.ip[0]
+
    alerts = ses.pop_alerts()
    for a in alerts:
       #if a.category() & lt.alert.category_t.error_notification:
@@ -62,4 +75,4 @@ while (not h.is_seed()):
 
    time.sleep(1)
 
-print h.name(), 'complete'
+print th.name(), 'complete'
