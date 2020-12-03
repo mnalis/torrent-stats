@@ -23,7 +23,7 @@ while (not h.is_seed()):
 
 	alerts = ses.pop_alerts()
 	for a in alerts:
-		if a.category() & lt.alert.category_t.error_notification:
+#		if a.category() & lt.alert.category_t.error_notification:
 			print(a)
 
 	sys.stdout.flush()
