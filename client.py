@@ -22,6 +22,7 @@ class WindowsConsole:
         self.console.write(str)
 
     def sleep_and_input(self, seconds):
+        sys.stdout.flush()
         time.sleep(seconds)
         if msvcrt.kbhit():
             return msvcrt.getch()
@@ -44,11 +45,11 @@ class UnixConsole:
 
     def clear(self):
         sys.stdout.write('\033[2J\033[0;0H')
-        sys.stdout.flush()
+        #sys.stdout.flush()
 
     def write(self, str):
         sys.stdout.write(str)
-        sys.stdout.flush()
+        #sys.stdout.flush()
 
     def sleep_and_input(self, seconds):
         read,_,_ = select.select([self.fd.fileno()], [], [], seconds)
@@ -93,9 +94,14 @@ def print_peer_info(console, peers):
         out += '(%s) ' % add_suffix(p.total_download)
         out += '%s/s ' % add_suffix(p.up_speed)
         out += '(%s) ' % add_suffix(p.total_upload)
-        out += '%2d ' % p.download_queue_length
-        out += '%2d ' % p.upload_queue_length
+        out += '%4d ' % p.download_queue_length
+        out += '%4d ' % p.upload_queue_length
 
+        if p.flags & lt.peer_info.seed:
+            out += 'W' if p.connection_type & lt.peer_info.web_seed else 'S'
+        else:
+            out += '.'
+                
         out += 'I' if p.flags & lt.peer_info.interesting else '.'
         out += 'C' if p.flags & lt.peer_info.choked else '.'
         out += 'i' if p.flags & lt.peer_info.remote_interested else '.'
@@ -235,6 +241,7 @@ def main():
         out = ''
 
         for h,t in torrents.items():
+            out += 'h=%s  --- ' % h
             out += 'name: %-40s\n' % t.name[:40]
 
             if t.state != lt.torrent_status.seeding:
@@ -265,7 +272,7 @@ def main():
             write_line(console, out)
 
             print_peer_info(console, t.handle.get_peer_info())
-            print_download_queue(console, t.handle.get_download_queue())
+            #print_download_queue(console, t.handle.get_download_queue())
 
             if t.state != lt.torrent_status.seeding:
                 try:
@@ -293,6 +300,7 @@ def main():
                 h.set_max_connections(60)
                 h.set_max_uploads(-1)
                 torrents[h] = h.status()
+                print "/mn/ adding h=%s status=%s" % (h, torrents[h])
 
             # update our torrent_status array for torrents that have
             # changed some of their state
@@ -300,8 +308,8 @@ def main():
                 for s in a.status:
                     torrents[s.handle] = s
 
-        if len(alerts_log) > 8:
-            del alerts_log[:len(alerts_log) - 8]
+        if len(alerts_log) > 28:
+            del alerts_log[:len(alerts_log) - 28]
 
         for a in alerts_log:
             write_line(console, a + '\n')
