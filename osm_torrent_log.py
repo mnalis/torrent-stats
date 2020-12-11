@@ -41,8 +41,16 @@ sql.execute("""
 """)
 
 hashes = (
-        'D84256FCBF807BA6B1257798176DF4CEB3056504',
-        '049C08A4934C8A2EACE7E92A1F3F01F35B045660'
+        '049c08a4934c8a2eace7e92a1f3f01f35b045660',
+        '19d3fb366bf63d547de0abf7f783f6271e9ecfe1',
+        '39a642c6bc8cf99e1bff34b8fc6234bee4b1cf39',
+        '46bbe95a64c793127068c3c86c62a3a4f6be1c03',
+        '48cd7fe8a7f37866b28ca47d1f14daec67c26f5c',
+        '750cc99604ab9239bd1723b03c8b0e27be68e554',
+        'b20a4a3c5dcf6c4195474d68616ec19e8299124c',
+        'd3be6148991b579ff40520ef43d6b87249eda2b6',
+        'd84256fcbf807ba6b1257798176df4ceb3056504',
+        'ffdae9989b9fb625fd352fa179845fef0049ecbc',
 ) 
 
 # initialize current time here, as we need it to be constant for ALL trackers/hashes in this program run!
