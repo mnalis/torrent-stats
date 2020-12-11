@@ -62,7 +62,7 @@ def do_tracker (tracker_id, announce_url):
             print ('  hash=',hash, ' --- stats=',stats)
             sql.execute ('INSERT INTO torrent_stats (tracker_id, hash, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash, _now, stats['peers'], stats['seeds'], stats['complete']))
     except:
-        print (' hash=', hash, ' --- scraping FAILED, skipping');
+        print ('  --- scraping FAILED, skipping');
     
 def do_all_trackers():
     tr_sql = connection.cursor()
