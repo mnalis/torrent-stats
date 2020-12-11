@@ -45,19 +45,24 @@ hashes = (
         '049C08A4934C8A2EACE7E92A1F3F01F35B045660'
 ) 
 
+# initialize current time here, as we need it to be constant for ALL trackers/hashes in this program run!
 _now = int(time.time())
 
 
 # ex.scrape: {'D84256FCBF807BA6B1257798176DF4CEB3056504': {'peers': 25, 'seeds': 4, 'complete': 9}, '049C08A4934C8A2EACE7E92A1F3F01F35B045660': {'peers': 2, 'seeds': 13, 'complete': 31}}
 
+# FIXME: try/except in case scraping of one client fails
 def do_tracker (tracker_id, announce_url):
-    print ('tracker:', announce_url)
-    scr = scrape (announce_url, hashes)
-    #print (' scrape:', scr,"\n")
-    for hash in scr:
-        stats = scr[hash]
-        print ('  hash=',hash, ' --- stats=',stats)
-        sql.execute ('INSERT INTO torrent_stats (tracker_id, hash, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash, _now, stats['peers'], stats['seeds'], stats['complete']))
+    #print ('scraping tracker:', announce_url)
+    try:
+        scr = scrape (announce_url, hashes)
+        #print (' scrape:', scr,"\n")
+        for hash in scr:
+            stats = scr[hash]
+            print ('  hash=',hash, ' --- stats=',stats)
+            sql.execute ('INSERT INTO torrent_stats (tracker_id, hash, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash, _now, stats['peers'], stats['seeds'], stats['complete']))
+    except:
+        print (' hash=', hash, ' --- scraping FAILED, skipping');
     
 def do_all_trackers():
     tr_sql = connection.cursor()
@@ -68,6 +73,6 @@ def do_all_trackers():
 print ('IPv4/mixed:')
 do_all_trackers()
 
-# FIXME - IPv6 does not work! check not only connceting, but different datasctructure, and share back via PR. Also fix to be python3 compatible
+# FIXME - IPv6 does not work! check not only connceting, but different datasctructure, and share back via PR.
 #print ('IPv6 only:')
 #b = do_tracker ('udp://tracker.datacenterlight.ch:6969/announce')
