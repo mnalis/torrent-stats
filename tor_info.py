@@ -3,7 +3,7 @@ import libtorrent as lt
 import time
 import sys
 import pprint
-
+import datetime
 
 settings = { 'user_agent': 'python_client/' + lt.__version__,
 #        'download_rate_limit': int(options.max_download_rate),
@@ -20,7 +20,8 @@ ses.listen_on(6881, 6891)
 
 info = lt.torrent_info(sys.argv[1])
 print "piece len=", info.piece_length(), " piece count=", info.num_pieces()
-print "creator=", info.creator(), "comment=", info.comment()
+print "creator=", info.creator(), "date=", datetime.datetime.fromtimestamp(info.creation_date())
+print "comment=", info.comment()
 print "name=", info.name(), "num_files=", info.num_files()
 print "magnet=", lt.make_magnet_uri(info)
 
