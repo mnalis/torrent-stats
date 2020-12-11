@@ -3,3 +3,4 @@
 *.fastresume
 *~
 *.pyc
+log*.txt

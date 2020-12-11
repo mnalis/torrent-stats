@@ -24,6 +24,9 @@ print "creator=", info.creator(), "comment=", info.comment()
 print "name=", info.name(), "num_files=", info.num_files()
 print "magnet=", lt.make_magnet_uri(info)
 
+for webseed in info.web_seeds():
+  print "webseed", webseed
+  #info.remove_url_seed (webseed)
 
 th = ses.add_torrent({'ti': info, 'save_path': './'})
 
@@ -32,9 +35,6 @@ print "magnet2=", lt.make_magnet_uri(th)
 
 
 
-#for webseed in th.web_seeds():
-#  print "webseed", webseed
-#  #info.remove_url_seed (webseed)
 
 while (not th.is_seed()):
    s = th.status()
