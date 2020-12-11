@@ -1,6 +1,8 @@
+__pycache__
 *.torrent
 *.pbf
 *.fastresume
 *~
 *.pyc
 log*.txt
+*.sqlite
