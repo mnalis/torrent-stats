@@ -1,5 +1,5 @@
 import binascii, urllib, socket, random, struct
-from bcode import bdecode
+#from bcode import bdecode
 from urlparse import urlparse, urlunsplit
 
 def scrape(tracker, hashes):
