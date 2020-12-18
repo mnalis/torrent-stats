@@ -3,3 +3,5 @@
 	- for each tracker show number of seeders/leechers at some time
 	  (ipv4 and ipv6 separate and together if possible)
 	- create RRD for graphs for few last torrent files
+
+- can we use libtorrent instead of (some parts of) scraper.py ?
