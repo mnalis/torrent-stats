@@ -2,9 +2,11 @@
 # started Matija Nalis <mnalis-git@voyager.hr> GPLv3+ 2020-12-11
 # logs OpenStreetMap bittorrent statistics to sqlite3 DB
 
+import libtorrent as lt
 from scraper import scrape
 import time
 import apsw
+from sys import argv
 
 DBFILE='osm-torrent-stats.sqlite'
 
@@ -40,7 +42,7 @@ sql.execute("""
     FOREIGN KEY (tracker_id) REFERENCES trackers (id) )
 """)
 
-hashes = (
+hashes = [
         '049c08a4934c8a2eace7e92a1f3f01f35b045660',
         '19d3fb366bf63d547de0abf7f783f6271e9ecfe1',
         '39a642c6bc8cf99e1bff34b8fc6234bee4b1cf39',
@@ -53,7 +55,7 @@ hashes = (
         'd3be6148991b579ff40520ef43d6b87249eda2b6',
         'd84256fcbf807ba6b1257798176df4ceb3056504',
         'ffdae9989b9fb625fd352fa179845fef0049ecbc',
-) 
+]
 
 # initialize current time here, as we need it to be constant for ALL trackers/hashes in this program run!
 _now = int(time.time())
@@ -78,6 +80,18 @@ def do_all_trackers():
     tr_sql = connection.cursor()
     for tracker_id, announce_url in tr_sql.execute ('SELECT id, announce_url FROM trackers'):
         do_tracker (tracker_id, announce_url)
+
+def add_hash(hash):
+    if hash in hashes:
+        print ('Skipping duplicate hash', hash)
+    else:
+        print ('Adding hash', hash)
+        hashes.append(hash)
+
+# find new torrent files
+for torrent_filename in argv[1:]:
+  info = lt.torrent_info(torrent_filename)
+  add_hash (str(info.info_hash()))
     
 
 print ('IPv4/mixed:')
