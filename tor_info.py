@@ -22,6 +22,7 @@ info = lt.torrent_info(sys.argv[1])
 print "piece len=", info.piece_length(), " piece count=", info.num_pieces()
 print "creator=", info.creator(), "date=", datetime.datetime.fromtimestamp(info.creation_date())
 print "comment=", info.comment()
+print "hash=", info.info_hash()
 print "name=", info.name(), "num_files=", info.num_files()
 print "magnet=", lt.make_magnet_uri(info)
 
