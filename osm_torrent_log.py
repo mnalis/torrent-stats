@@ -55,6 +55,7 @@ sql.execute("""
     FOREIGN KEY (hash_id) REFERENCES hashes (id) )
 """)
 
+# do not forget "alter table torrent_stats add hash_id integer NOT NULL;" for transition
 hashes = [
         '049c08a4934c8a2eace7e92a1f3f01f35b045660',
         '19d3fb366bf63d547de0abf7f783f6271e9ecfe1',
