@@ -5,3 +5,6 @@
 	- create RRD for graphs for few last torrent files
 
 - can we use libtorrent instead of (some parts of) scraper.py ?
+- we can change scraper.py to use libtorrent instead of separate bencode modules at least?
+- check http scraper.py support
+- fix/add IPv6 scraper.py support
