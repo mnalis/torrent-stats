@@ -71,7 +71,7 @@ hashes = [
 ]
 
 for h in hashes:
-    sql.execute ('INSERT INTO hashes (hash) VALUES (?) ON CONFLICT DO NOTHING', (h,))
+    sql.execute ('INSERT OR IGNORE INTO hashes (hash) VALUES (?)', (h,))
 
 sql.execute('UPDATE torrent_stats SET hash_id=(SELECT id from hashes where hashes.hash=torrent_stats.hash)');
 
@@ -102,7 +102,7 @@ def do_all_trackers():
         do_tracker (tracker_id, announce_url)
 
 def add_hash(hash):
-    sql.execute ('INSERT INTO hashes (hash, scrape) VALUES (?, ?) ON CONFLICT DO NOTHING', (hash.lower(), 1))
+    sql.execute ('INSERT OR IGNORE INTO hashes (hash, scrape) VALUES (?, ?)', (hash.lower(), 1))
 
 # find new torrent files from cmdline (if specified) and add them to the list
 for torrent_filename in argv[1:]:
