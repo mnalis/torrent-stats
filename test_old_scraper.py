@@ -23,7 +23,7 @@ print ("IPv4/mixed UDP:")
 
 print ("IPv4/mixed TCP:");
 a3=do_tracker('http://tracker.gbitt.info/announce');
-#a4=do_tracker('https://tracker.gbitt.info/announce');
+a4=do_tracker('https://tracker.gbitt.info/announce');
 
 # FIXME - IPv6 does not work! check not only connceting, but different datasctructure, and share back via PR. Also fix to be python3 compatible
 #print ("IPv6 only:")

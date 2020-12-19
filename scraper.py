@@ -64,13 +64,11 @@ def scrape_http(parsed_tracker, hashes):
 	qs = urlencode(qs)
 	pt = parsed_tracker	
 	url = urlunsplit((pt.scheme, pt.netloc, pt.path, qs, pt.fragment))
-	print("/mn/ opening URL", url)
 	handle = urlopen(url);
 	if handle.getcode() is not 200:
 		raise RuntimeError("%s status code returned" % handle.getcode())	
 	decoded = bdecode(handle.read())
 	ret = {}
-	print ("/mn/ decoded=",decoded)
 	for hash, stats in decoded[b'files'].items():
 		nice_hash = binascii.b2a_hex(hash).decode('UTF-8')
 		s = stats[b'complete']
