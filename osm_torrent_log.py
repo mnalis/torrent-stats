@@ -22,25 +22,16 @@ sql.execute("""
     id integer PRIMARY KEY AUTOINCREMENT,
     announce_url varchar(255),
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (announce_url) )
-""")
+    UNIQUE (announce_url) );
 
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.opentrackr.org:1337/announce',))
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker-udp.gbitt.info:80/announce',))
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
-
-sql.execute("""
   CREATE TABLE IF NOT EXISTS hashes (
     id integer PRIMARY KEY AUTOINCREMENT,
     hash char(40) NOT NULL,
     filename varchar(255),
     scrape integer NOT NULL DEFAULT 1,
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (hash) )
-""")
+    UNIQUE (hash) );
 
-
-sql.execute(""" 
   CREATE TABLE IF NOT EXISTS torrent_stats (
     tracker_id integer NOT NULL,
     hash_id integer NOT NULL,
@@ -51,8 +42,12 @@ sql.execute("""
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(hash_id, timestamp, tracker_id),
     FOREIGN KEY (tracker_id) REFERENCES trackers (id),
-    FOREIGN KEY (hash_id) REFERENCES hashes (id) )
+    FOREIGN KEY (hash_id) REFERENCES hashes (id) );
 """)
+
+sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.opentrackr.org:1337/announce',))
+sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker-udp.gbitt.info:80/announce',))
+sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
 
 hashes = [];
 
@@ -60,7 +55,7 @@ hashes = [];
 _now = int(time.time())
 
 
-# ex.scrape: {'D84256FCBF807BA6B1257798176DF4CEB3056504': {'peers': 25, 'seeds': 4, 'complete': 9}, '049C08A4934C8A2EACE7E92A1F3F01F35B045660': {'peers': 2, 'seeds': 13, 'complete': 31}}
+# example scrape: {'D84256FCBF807BA6B1257798176DF4CEB3056504': {'peers': 25, 'seeds': 4, 'complete': 9}, '049C08A4934C8A2EACE7E92A1F3F01F35B045660': {'peers': 2, 'seeds': 13, 'complete': 31}}
 
 #
 # scrape all infohashes from specified tracker
@@ -69,12 +64,10 @@ def do_tracker (tracker_id, announce_url):
     #print ('scraping tracker:', announce_url)
     try:
         scr = scrape (announce_url, hashes)
-        #print (' scrape:', scr,"\n")
         for hash in scr:
             stats = scr[hash]
             print ('  hash=',hash, ' --- stats=',stats)
             hash_id, = [h[0] for h in sql.execute ('SELECT id FROM hashes WHERE hash=?', (hash,))]
-            #print ("hashid=", hash_id)
             sql.execute ('INSERT INTO torrent_stats (tracker_id, hash_id, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash_id, _now, stats['peers'], stats['seeds'], stats['complete']))
     except:	# scraping of one tracker failed, just skip it this time
         print ('  --- scraping FAILED, skipping');
@@ -94,9 +87,8 @@ for torrent_filename in argv[1:]:
     info = lt.torrent_info(torrent_filename)
     add_hash (str(info.info_hash()))
 
-# get a list of all hashes to scrape
+# get a list of all hashes to scrape from `hashes` tables
 hashes = [h[0] for h in sql.execute ('SELECT hash FROM hashes WHERE scrape=1')]
-#print ("sql Hashes=", hashes);
 
 
 # update status of all trackers (for all infohashes)
