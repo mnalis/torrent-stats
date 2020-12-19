@@ -1,7 +1,7 @@
 import binascii, urllib, socket, random, struct
-#from bcode import bdecode
-#from urlparse import urlparse, urlunsplit
-from urllib.parse import urlparse, urlunsplit
+from libtorrent import bdecode
+from urllib.parse import urlparse, urlunsplit, urlencode
+from urllib.request import urlopen
 
 def scrape(tracker, hashes):
 	"""
@@ -61,19 +61,21 @@ def scrape_http(parsed_tracker, hashes):
 	for hash in hashes:
 		url_param = binascii.a2b_hex(hash)
 		qs.append(("info_hash", url_param))
-	qs = urllib.urlencode(qs)
+	qs = urlencode(qs)
 	pt = parsed_tracker	
 	url = urlunsplit((pt.scheme, pt.netloc, pt.path, qs, pt.fragment))
-	handle = urllib.urlopen(url);
+	print("/mn/ opening URL", url)
+	handle = urlopen(url);
 	if handle.getcode() is not 200:
 		raise RuntimeError("%s status code returned" % handle.getcode())	
 	decoded = bdecode(handle.read())
 	ret = {}
-	for hash, stats in decoded['files'].iteritems():		
-		nice_hash = binascii.b2a_hex(hash)		
-		s = stats["complete"]
-		p = stats["incomplete"]
-		c = stats["downloaded"]
+	print ("/mn/ decoded=",decoded)
+	for hash, stats in decoded[b'files'].items():
+		nice_hash = binascii.b2a_hex(hash).decode('UTF-8')
+		s = stats[b'complete']
+		p = stats[b'incomplete']
+		c = stats[b'downloaded']
 		ret[nice_hash] = { "seeds" : s, "peers" : p, "complete" : c}		
 	return ret
 
