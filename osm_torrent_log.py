@@ -62,7 +62,9 @@ _now = int(time.time())
 
 # ex.scrape: {'D84256FCBF807BA6B1257798176DF4CEB3056504': {'peers': 25, 'seeds': 4, 'complete': 9}, '049C08A4934C8A2EACE7E92A1F3F01F35B045660': {'peers': 2, 'seeds': 13, 'complete': 31}}
 
-# FIXME: try/except in case scraping of one client fails
+#
+# scrape all infohashes from specified tracker
+#
 def do_tracker (tracker_id, announce_url):
     #print ('scraping tracker:', announce_url)
     try:
@@ -74,26 +76,27 @@ def do_tracker (tracker_id, announce_url):
             hash_id, = [h[0] for h in sql.execute ('SELECT id FROM hashes WHERE hash=?', (hash,))]
             #print ("hashid=", hash_id)
             sql.execute ('INSERT INTO torrent_stats (tracker_id, hash_id, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash_id, _now, stats['peers'], stats['seeds'], stats['complete']))
-    except:
+    except:	# scraping of one tracker failed, just skip it this time
         print ('  --- scraping FAILED, skipping');
-    
+
+# scrape all trackers from `trackers` table
 def do_all_trackers():
     tr_sql = connection.cursor()
     for tracker_id, announce_url in tr_sql.execute ('SELECT id, announce_url FROM trackers'):
         do_tracker (tracker_id, announce_url)
 
+# add new infohash to track to `hashes` table
 def add_hash(hash):
     sql.execute ('INSERT OR IGNORE INTO hashes (hash, scrape) VALUES (?, ?)', (hash.lower(), 1))
 
-# find new torrent files from cmdline (if specified) and add them to the list
+# find new torrent files from cmdline (if specified) and add them to the tables of hashes to scrape
 for torrent_filename in argv[1:]:
     info = lt.torrent_info(torrent_filename)
     add_hash (str(info.info_hash()))
 
 # get a list of all hashes to scrape
-h_sql = connection.cursor()
-hashes = [h[0] for h in h_sql.execute ('SELECT hash FROM hashes WHERE scrape=1')]
-print ("sql Hashes=", hashes);
+hashes = [h[0] for h in sql.execute ('SELECT hash FROM hashes WHERE scrape=1')]
+#print ("sql Hashes=", hashes);
 
 
 # update status of all trackers (for all infohashes)
