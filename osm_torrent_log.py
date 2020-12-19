@@ -73,7 +73,7 @@ def do_tracker (tracker_id, announce_url):
             print ('  hash=',hash, ' --- stats=',stats)
             hash_id, = [h[0] for h in sql.execute ('SELECT id FROM hashes WHERE hash=?', (hash,))]
             #print ("hashid=", hash_id)
-            sql.execute ('INSERT INTO torrent_stats (tracker_id, hash, hash_id, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?, ?)', (tracker_id, hash, hash_id, _now, stats['peers'], stats['seeds'], stats['complete']))
+            sql.execute ('INSERT INTO torrent_stats (tracker_id, hash_id, timestamp, peers, seeds, complete) VALUES (?, ?, ?, ?, ?, ?)', (tracker_id, hash_id, _now, stats['peers'], stats['seeds'], stats['complete']))
     except:
         print ('  --- scraping FAILED, skipping');
     
