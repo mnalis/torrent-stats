@@ -48,6 +48,7 @@ sql.execute("""
 sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.opentrackr.org:1337/announce',))
 sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker-udp.gbitt.info:80/announce',))
 sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
+sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.datacenterlight.ch:6969/announce',))
 
 hashes = [];
 
@@ -90,12 +91,5 @@ for torrent_filename in argv[1:]:
 # get a list of all hashes to scrape from `hashes` tables
 hashes = [h[0] for h in sql.execute ('SELECT hash FROM hashes WHERE scrape=1')]
 
-
 # update status of all trackers (for all infohashes)
-print ('IPv4/mixed:')
 do_all_trackers()
-
-
-# FIXME - IPv6 does not work! check not only connceting, but different datasctructure, and share back via PR.
-#print ('IPv6 only:')
-#b = do_tracker ('udp://tracker.datacenterlight.ch:6969/announce')
