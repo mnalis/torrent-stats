@@ -18,13 +18,13 @@ def do_tracker (tracker):
 
 print ("IPv4/mixed UDP:")
 #a1=do_tracker ('udp://tracker.opentrackr.org:1337/announce')
-#a2=do_tracker ('udp://tracker-udp.gbitt.info:80/announce')
+a2=do_tracker ('udp://tracker-udp.gbitt.info:80/announce')
 #a3=do_tracker ('udp://tracker.torrent.eu.org:451')
 
-print ("IPv4/mixed TCP:");
-a3=do_tracker('http://tracker.gbitt.info/announce');
-a4=do_tracker('https://tracker.gbitt.info/announce');
+#print ("IPv4/mixed TCP:");
+#a3=do_tracker('http://tracker.gbitt.info/announce');
+#a4=do_tracker('https://tracker.gbitt.info/announce');
 
 # FIXME - IPv6 does not work! check not only connceting, but different datasctructure, and share back via PR. Also fix to be python3 compatible
-#print ("IPv6 only:")
-#b=do_tracker ('udp://tracker.datacenterlight.ch:6969/announce')
+print ("IPv6 only:")
+b=do_tracker ('udp://tracker.datacenterlight.ch:6969/announce')
