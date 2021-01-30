@@ -8,3 +8,4 @@
 - we can change scraper.py to use libtorrent instead of separate bencode modules at least?
 - check http scraper.py support
 - fix/add IPv6 scraper.py support
+- put all SQL commands  in array, and execute them all at once - to minimize SQLite database locking issues
