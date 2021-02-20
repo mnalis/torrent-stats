@@ -50,6 +50,9 @@ sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://
 sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
 sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.datacenterlight.ch:6969/announce',))
 
+# there is limit on number of hashes to scrape at once, so ignore old torrents after some time
+sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
+
 hashes = [];
 
 # initialize current time here, as we need it to be constant for ALL trackers/hashes in this program run!
