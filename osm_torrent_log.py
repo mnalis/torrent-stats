@@ -12,12 +12,15 @@ DBFILE='osm-torrent-stats.sqlite'
 
 print ('OSM bittorrent scrape and log statistics')
 
-def sql_init():
+def sql_open():
     global connection, sql
-    connection=apsw.Connection(DBFILE)
-    sql=connection.cursor()
+    connection = apsw.Connection(DBFILE)
+    sql = connection.cursor()
 
     sql.execute ('PRAGMA foreign_keys = ON')
+
+def sql_init():
+    sql_open()
 
     sql.execute("""
       CREATE TABLE IF NOT EXISTS trackers (
