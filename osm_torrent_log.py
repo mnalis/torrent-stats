@@ -13,6 +13,7 @@ DBFILE='osm-torrent-stats.sqlite'
 print ('OSM bittorrent scrape and log statistics')
 
 def sql_init():
+    global connection, sql
     connection=apsw.Connection(DBFILE)
     sql=connection.cursor()
 
@@ -92,16 +93,15 @@ def add_hash(hash):
 
 sql_init()
 
-# there is limit on number of hashes to scrape at once, so ignore old torrents after some time
-sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
-
 # find new torrent files from cmdline (if specified) and add them to the tables of hashes to scrape
 for torrent_filename in argv[1:]:
     info = lt.torrent_info(torrent_filename)
     add_hash (str(info.info_hash()))
 
+# there is limit on number of hashes to scrape at once, so ignore old torrents after some time
+#sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
 # get a list of all hashes to scrape from `hashes` tables
-hashes = [h[0] for h in sql.execute ('SELECT hash FROM hashes WHERE scrape=1')]
+hashes = [h[0] for h in sql.execute ('SELECT hash FROM hashes WHERE scrape=1 ORDER BY id DESC LIMIT 16')]
 
 # update status of all trackers (for all infohashes)
 do_all_trackers()

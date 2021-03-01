@@ -9,3 +9,4 @@
 - check http scraper.py support
 - fix/add IPv6 scraper.py support
 - put all SQL commands  in array, and execute them all at once - to minimize SQLite database locking issues
+  or use "PRAGMA journal_mode=WAL" from https://www.sqlite.org/wal.html as quick alternative
