@@ -10,48 +10,47 @@ from sys import argv
 
 DBFILE='osm-torrent-stats.sqlite'
 
-print ('OSM bittorrent scrape test')
+print ('OSM bittorrent scrape and log statistics')
 
-connection=apsw.Connection(DBFILE)
-sql=connection.cursor()
+def sql_init():
+    connection=apsw.Connection(DBFILE)
+    sql=connection.cursor()
 
-sql.execute ('PRAGMA foreign_keys = ON')
+    sql.execute ('PRAGMA foreign_keys = ON')
 
-sql.execute("""
-  CREATE TABLE IF NOT EXISTS trackers (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    announce_url varchar(255),
-    created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (announce_url) );
+    sql.execute("""
+      CREATE TABLE IF NOT EXISTS trackers (
+        id integer PRIMARY KEY AUTOINCREMENT,
+        announce_url varchar(255),
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (announce_url) );
 
-  CREATE TABLE IF NOT EXISTS hashes (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    hash char(40) NOT NULL,
-    filename varchar(255),
-    scrape integer NOT NULL DEFAULT 1,
-    created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (hash) );
+      CREATE TABLE IF NOT EXISTS hashes (
+        id integer PRIMARY KEY AUTOINCREMENT,
+        hash char(40) NOT NULL,
+        filename varchar(255),
+        scrape integer NOT NULL DEFAULT 1,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (hash) );
 
-  CREATE TABLE IF NOT EXISTS torrent_stats (
-    tracker_id integer NOT NULL,
-    hash_id integer NOT NULL,
-    timestamp integer NOT NULL,
-    peers integer,
-    seeds integer,
-    complete integer,
-    created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(hash_id, timestamp, tracker_id),
-    FOREIGN KEY (tracker_id) REFERENCES trackers (id),
-    FOREIGN KEY (hash_id) REFERENCES hashes (id) );
-""")
+      CREATE TABLE IF NOT EXISTS torrent_stats (
+        tracker_id integer NOT NULL,
+        hash_id integer NOT NULL,
+        timestamp integer NOT NULL,
+        peers integer,
+        seeds integer,
+        complete integer,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(hash_id, timestamp, tracker_id),
+        FOREIGN KEY (tracker_id) REFERENCES trackers (id),
+        FOREIGN KEY (hash_id) REFERENCES hashes (id) );
+    """)
 
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.opentrackr.org:1337/announce',))
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker-udp.gbitt.info:80/announce',))
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
-sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.datacenterlight.ch:6969/announce',))
+    sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.opentrackr.org:1337/announce',))
+    sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker-udp.gbitt.info:80/announce',))
+    sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.torrent.eu.org:451',))
+    sql.execute('INSERT OR IGNORE INTO trackers (announce_url) VALUES (?)', ('udp://tracker.datacenterlight.ch:6969/announce',))
 
-# there is limit on number of hashes to scrape at once, so ignore old torrents after some time
-sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
 
 hashes = [];
 
@@ -85,6 +84,16 @@ def do_all_trackers():
 # add new infohash to track to `hashes` table
 def add_hash(hash):
     sql.execute ('INSERT OR IGNORE INTO hashes (hash, scrape) VALUES (?, ?)', (hash.lower(), 1))
+
+
+#
+# here goes the main
+#
+
+sql_init()
+
+# there is limit on number of hashes to scrape at once, so ignore old torrents after some time
+sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
 
 # find new torrent files from cmdline (if specified) and add them to the tables of hashes to scrape
 for torrent_filename in argv[1:]:
