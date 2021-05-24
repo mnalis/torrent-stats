@@ -1,6 +1,6 @@
 #!/bin/sh
 BASE="https://planet.openstreetmap.org"
-WGET_OPTS="-q -N"
+WGET_OPTS="-q --trust-server-names -N"
 wget ${WGET_OPTS} ${BASE}/pbf/planet-latest.osm.pbf.torrent
 wget ${WGET_OPTS} ${BASE}/pbf/full-history/history-latest.osm.pbf.torrent
 
