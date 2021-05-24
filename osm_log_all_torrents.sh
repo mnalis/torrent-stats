@@ -11,3 +11,5 @@ wget ${WGET_OPTS} ${BASE}/planet/changesets-latest.osm.bz2.torrent
 wget ${WGET_OPTS} ${BASE}/planet/discussions-latest.osm.bz2.torrent
 
 ./osm_torrent_log.py *.torrent
+
+find . -maxdepth 1 -name "*.osm.*.torrent" -mtime +16 -delete
