@@ -86,8 +86,8 @@ def do_all_trackers():
         do_tracker (tracker_id, announce_url)
 
 # add new infohash to track to `hashes` table
-def add_hash(hash):
-    sql.execute ('INSERT OR IGNORE INTO hashes (hash, scrape) VALUES (?, ?)', (hash.lower(), 1))
+def add_hash_name(hash, filename):
+    sql.execute ('INSERT OR IGNORE INTO hashes (hash, scrape, filename) VALUES (?, ?, ?)', (hash.lower(), 1, filename))
 
 
 #
@@ -99,7 +99,7 @@ sql_init()
 # find new torrent files from cmdline (if specified) and add them to the tables of hashes to scrape
 for torrent_filename in argv[1:]:
     info = lt.torrent_info(torrent_filename)
-    add_hash (str(info.info_hash()))
+    add_hash_name (str(info.info_hash()), torrent_filename)
 
 # there is limit on number of hashes to scrape at once, so ignore old torrents after some time
 #sql.execute('UPDATE hashes SET scrape=0 WHERE created < date("now","-1 month")');
